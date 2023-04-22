@@ -4,6 +4,7 @@ type SearchBarProps = {
   text: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClick: () => void;
+  placeholder: string;
 }
 
 const Container = styled.div`
@@ -33,10 +34,10 @@ const Img = styled.img`
   right: 15px;
 `
 
-export default function SearchBar({ text, onChange, onClick }: SearchBarProps) {
+export default function SearchBar({ text, onChange, onClick, placeholder }: SearchBarProps) {
   return (
     <Container>
-      <Input placeholder="가맹점을 검색해보세요" value={text} onChange={onChange} />
+      <Input placeholder={placeholder} value={text} onChange={onChange} />
       <Img src="images/search.svg" onClick={onClick} />
     </Container>
   );

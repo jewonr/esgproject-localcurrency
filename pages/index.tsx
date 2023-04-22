@@ -29,8 +29,7 @@ export default function Home() {
     }
     console.log(option, input);
     await axios.get(`https://openapi.gg.go.kr/RegionMnyFacltStus?Key=${process.env.NEXT_PUBLIC_API_KEY}&Type=json&pIndex=1&pSize=10&${option}=${input}`)
-    // await axios.get(`https://openapi.gg.go.kr/RegionMnyFacltStus?Key=${process.env.NEXT_PUBLIC_API_KEY}&Type=json&pIndex=1&pSize=10&SIGUN_NM=고양시`)
-      .then(data => setData(data.data.RegionMnyFacltStus[1].row));
+      .then(data => {setData(data.data.RegionMnyFacltStus[1].row)});
   }
 
   useEffect(() => {
@@ -39,6 +38,10 @@ export default function Home() {
         .then(data => setData(data.data.RegionMnyFacltStus[1].row));
     })();
   }, []);
+
+  useEffect(() => {
+    console.log(data);
+  }, [data])
 
   return (
     <>
