@@ -10,8 +10,8 @@ type OptionListProps = {
 
 const Container = styled.div`
   display: flex;
-  gap: 15px;
-  margin-top: 30px;
+  gap: 15px 10px;
+  margin: 30px 0 15px 0;
   width: fit-content;
   flex-wrap: wrap;
 `

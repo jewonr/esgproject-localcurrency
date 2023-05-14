@@ -28,13 +28,14 @@ const CancelButton = styled.img`
   right: 20px;
 `
 
-const optionList = ["지역 검색", "도로명주소 검색", "업종별 검색", "상품권별 검색"];
+const optionList = ["지역 검색", "도로명주소 검색", "업종별 검색"];
 
 export default function Search({ onClickSearchButton, isActive, setIsActive }: SearchProps) {
   const [input, setInput] = useState("");
   const [clickedOption, setClickedOption] = useState([false, false, false, false]);
   const [clickedOptionIdx, setClickedOptionIdx] = useState(0);
   const [optionDetailActive, setOptionDetailActive] = useState(false);
+
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -48,10 +49,11 @@ export default function Search({ onClickSearchButton, isActive, setIsActive }: S
   useEffect(() => {
     for(let i = 0; i < clickedOption.length; i++) {
       if(clickedOption[i] && i != 1) {
-        console.log(i);
         setOptionDetailActive(true);
         setClickedOptionIdx(i);
         break;
+      } else {
+        setInput("");
       }
     }
   }, [clickedOption])
@@ -60,12 +62,12 @@ export default function Search({ onClickSearchButton, isActive, setIsActive }: S
     <Container isActive={isActive}>
       <CancelButton src="/images/x.svg" onClick={() => setIsActive(false)} />
       <SearchBar text={input} onChange={onChange} onClick={handleOnClickSearchButton} placeholder="선택한 옵션에 맞게 검색해보세요" />
-        <OptionList 
-          optionList={optionList} 
-          clickedOption={clickedOption} 
-          setClickedOption={setClickedOption} 
-        />
-      <SearchOptionDetail isActive={optionDetailActive} setIsActive={setOptionDetailActive} idx={clickedOptionIdx} />
+      <OptionList 
+        optionList={optionList} 
+        clickedOption={clickedOption} 
+        setClickedOption={setClickedOption} 
+      />
+      <SearchOptionDetail isActive={optionDetailActive} setIsActive={setOptionDetailActive} idx={clickedOptionIdx} setOption={setInput} />
     </Container>
   );
 }

@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import OptionList from "./OptionList";
 import { region } from "../region";
+import { sector } from "../sector";
 import SearchBar from "../header/SearchBar";
 
 type SearchOptionDetailProps = {
   isActive: boolean;
   setIsActive: ($: boolean) => void;
   idx: number;
+  setOption: ($: string) => void;
 }
 
 const Container = styled.div<{ isActive: boolean }>`
@@ -65,7 +67,7 @@ const SubmitButton = styled.div`
 const titleList = ["지역", "", "업종", "상품권"];
 const placeholderList = ["도 또는 광역시를 검색해보세요", "", "", ""];
 
-export default function SearchOptionDetail({ isActive, setIsActive, idx }: SearchOptionDetailProps) {
+export default function SearchOptionDetail({ isActive, setIsActive, idx, setOption }: SearchOptionDetailProps) {
   const [clickedOption, setClickedOption] = useState(new Array(30).fill(false));
   const [clickedOptionIdx, setClickedOptionIdx] = useState(0);
   const [input, setInput] = useState("");
@@ -84,6 +86,20 @@ export default function SearchOptionDetail({ isActive, setIsActive, idx }: Searc
     }
   }
 
+  const onClickCancelOrSaveButton = (option: "cancel" | "save") => {
+    if (option === "save") {
+      if(idx === 0) {
+        setOption(optionRegionList[clickedOptionIdx]);
+      } else if(idx === 2) {
+        setOption(sector[clickedOptionIdx])
+      }
+    }
+    setIsActive(false)
+    setClickedOption(new Array(30).fill(false));
+    setOptionRegionList([]);
+    setInput("");
+  }
+
   useEffect(() => {
     for(let i = 0; i < clickedOption.length; i++) {
       if(clickedOption[i]) {
@@ -98,13 +114,20 @@ export default function SearchOptionDetail({ isActive, setIsActive, idx }: Searc
   <Container isActive={isActive}>
     <Header>
       <Title>{titleList[idx]} 선택하기</Title>
-      <CancelButton src="/images/x.svg" onClick={() => setIsActive(false)} />
+      <CancelButton src="/images/x.svg" onClick={() => onClickCancelOrSaveButton("cancel")} />
     </Header>
     <Body>
-      <SearchBar text={input} onChange={onChange} onClick={onclickSearchButton} placeholder={placeholderList[0]} />
-      <OptionList optionList={optionRegionList} clickedOption={clickedOption} setClickedOption={setClickedOption} />
+      {idx == 0 && 
+        <>
+          <SearchBar text={input} onChange={onChange} onClick={onclickSearchButton} placeholder={placeholderList[0]} />
+          <OptionList optionList={optionRegionList} clickedOption={clickedOption} setClickedOption={setClickedOption} />
+        </> 
+      }
+      {idx == 2 && 
+        <OptionList optionList={sector} clickedOption={clickedOption} setClickedOption={setClickedOption} />
+      }
     </Body>
-    <SubmitButton>저장</SubmitButton>
+    <SubmitButton onClick={() => onClickCancelOrSaveButton("save")}>저장</SubmitButton>
   </Container>
  );
 }
