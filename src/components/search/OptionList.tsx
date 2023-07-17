@@ -1,4 +1,3 @@
-import { useState } from "react";
 import styled from "styled-components";
 import Option from "./Option";
 
@@ -12,7 +11,6 @@ const Container = styled.div`
   display: flex;
   gap: 15px 10px;
   margin: 30px 0 15px 0;
-  width: fit-content;
   flex-wrap: wrap;
 `
 

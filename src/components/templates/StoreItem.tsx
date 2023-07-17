@@ -26,6 +26,9 @@ const Title = styled.div`
 const Address = styled.div`
   font-size: 14px;
   color: #979797;
+  max-width: 80%;
+  max-height: 35px;
+  overflow: hidden;
 `
 
 const Local = styled.div`
@@ -51,10 +54,10 @@ const Distance = styled.div`
 export default function StoreItem({ data }: StoreItemProps) {
   return (
     <Container>
-      <Local>{data.SIGUN_NM}</Local>
-      <Title>{data.CMPNM_NM}</Title>
-      <Address>{data.REFINE_ROADNM_ADDR}</Address>
-      <Industry>{data.INDUTYPE_NM}</Industry>
+      <Local>{data.sggNm}</Local>
+      <Title>{data.affiliateNm}</Title>
+      <Address>{data.lctnRoadNmAddr}</Address>
+      <Industry>{data.sectorNm}</Industry>
       <Distance>10km</Distance>
     </Container>
   );

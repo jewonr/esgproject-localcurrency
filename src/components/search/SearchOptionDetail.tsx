@@ -64,7 +64,6 @@ const SubmitButton = styled.div`
   font-family: 'Spoqa-Bold';
 `
 
-const titleList = ["지역", "", "업종", "상품권"];
 const placeholderList = ["도 또는 광역시를 검색해보세요", "", "", ""];
 
 export default function SearchOptionDetail({ isActive, setIsActive, idx, setOption }: SearchOptionDetailProps) {
@@ -113,19 +112,12 @@ export default function SearchOptionDetail({ isActive, setIsActive, idx, setOpti
  return (
   <Container isActive={isActive}>
     <Header>
-      <Title>{titleList[idx]} 선택하기</Title>
+      <Title>지역 선택하기</Title>
       <CancelButton src="/images/x.svg" onClick={() => onClickCancelOrSaveButton("cancel")} />
     </Header>
     <Body>
-      {idx == 0 && 
-        <>
-          <SearchBar text={input} onChange={onChange} onClick={onclickSearchButton} placeholder={placeholderList[0]} />
-          <OptionList optionList={optionRegionList} clickedOption={clickedOption} setClickedOption={setClickedOption} />
-        </> 
-      }
-      {idx == 2 && 
-        <OptionList optionList={sector} clickedOption={clickedOption} setClickedOption={setClickedOption} />
-      }
+        <SearchBar text={input} onChange={onChange} onClick={onclickSearchButton} placeholder={placeholderList[0]} />
+        <OptionList optionList={optionRegionList} clickedOption={clickedOption} setClickedOption={setClickedOption} />
     </Body>
     <SubmitButton onClick={() => onClickCancelOrSaveButton("save")}>저장</SubmitButton>
   </Container>

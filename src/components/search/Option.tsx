@@ -7,7 +7,7 @@ type OptionProps = {
   onClickOption: ($: number) => void;
 }
 
-const Container = styled.div<{ isActive: boolean }>`
+const Container = styled.div<{ isActive: boolean, idx: number }>`
   background: ${props => props.isActive ? "rgba(198, 210, 50, 0.2)" : "#FFFFFF"};
   padding: 15px;
   font-size: 15px;
@@ -21,7 +21,7 @@ const Container = styled.div<{ isActive: boolean }>`
 
 export default function Option({ idx, isActive, text, onClickOption }: OptionProps) {
   return (
-    <Container isActive={isActive} onClick={() => onClickOption(idx)}>
+    <Container isActive={isActive} idx={idx} onClick={() => onClickOption(idx)}>
       {text}
     </Container>
   );

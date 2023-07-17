@@ -5,7 +5,7 @@ import OptionList from "./OptionList";
 import SearchOptionDetail from "./SearchOptionDetail";
 
 type SearchProps = {
-  onClickSearchButton: (idx: number, input: string) => void;
+  onClickSearchButton: (idx: number, input: string, region: string) => void;
   isActive: boolean;
   setIsActive: ($: boolean) => void;
 }
@@ -28,14 +28,52 @@ const CancelButton = styled.img`
   right: 20px;
 `
 
-const optionList = ["지역 검색", "도로명주소 검색", "업종별 검색"];
+const OptionWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+`
+
+const PrimaryOption = styled.div`
+  margin: 30px 0 15px 0;
+  background: var(--primary-color);
+  padding: 15px;
+  font-size: 15px;
+  color: #FFFFFF;
+  border-radius: 5px;
+  font-family: 'Spoqa-Bold';
+  height: 50px;
+`
+
+const SelectedRegion = styled.div`
+  margin: 30px 0 15px 0;
+  padding: 15px;
+  font-size: 15px;
+  border-radius: 5px;
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid #EFEFEF;
+  width: max-content;
+  gap: 15px;
+`
+
+const Text = styled.div`
+  font-family: 'Spoqa-Bold';
+  font-size: 15px;
+`
+
+const DeleteButton = styled.img`
+
+`
+
+const optionList = ["가맹점명 검색", "업종별 검색"];
 
 export default function Search({ onClickSearchButton, isActive, setIsActive }: SearchProps) {
   const [input, setInput] = useState("");
-  const [clickedOption, setClickedOption] = useState([false, false, false, false]);
+  const [clickedOption, setClickedOption] = useState([false, false, false]);
   const [clickedOptionIdx, setClickedOptionIdx] = useState(0);
   const [optionDetailActive, setOptionDetailActive] = useState(false);
-
+  const [selectedRegion, setSelectedRegion] = useState("");
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -43,31 +81,51 @@ export default function Search({ onClickSearchButton, isActive, setIsActive }: S
 
   const handleOnClickSearchButton = () => {
     setIsActive(false);
-    onClickSearchButton(clickedOptionIdx, input);
+    setInput("");
+    for(let i = 0; i < clickedOption.length; i++) {
+      if(clickedOption[i]) onClickSearchButton(i, input, selectedRegion);
+    }
   }
 
-  useEffect(() => {
-    for(let i = 0; i < clickedOption.length; i++) {
-      if(clickedOption[i] && i != 1) {
-        setOptionDetailActive(true);
-        setClickedOptionIdx(i);
-        break;
-      } else {
-        setInput("");
-      }
-    }
-  }, [clickedOption])
+  const onClickSelectRegionButton = () => {
+    setOptionDetailActive(true);
+  }
+
+  const onClickDeleteRegionButton = () => {
+    setSelectedRegion("");
+  }
+
+  // useEffect(() => {
+  //   for(let i = 0; i < clickedOption.length; i++) {
+  //     if(clickedOption[i]) {
+  //       setClickedOptionIdx(i);
+  //       break;
+  //     } else {
+  //       setInput("");
+  //     }
+  //   }
+  // }, [clickedOption])
 
   return (
     <Container isActive={isActive}>
       <CancelButton src="/images/x.svg" onClick={() => setIsActive(false)} />
       <SearchBar text={input} onChange={onChange} onClick={handleOnClickSearchButton} placeholder="선택한 옵션에 맞게 검색해보세요" />
-      <OptionList 
-        optionList={optionList} 
-        clickedOption={clickedOption} 
-        setClickedOption={setClickedOption} 
-      />
-      <SearchOptionDetail isActive={optionDetailActive} setIsActive={setOptionDetailActive} idx={clickedOptionIdx} setOption={setInput} />
+      <OptionWrapper>
+        <PrimaryOption onClick={onClickSelectRegionButton}>지역 선택</PrimaryOption>
+        <OptionList 
+          optionList={optionList} 
+          clickedOption={clickedOption} 
+          setClickedOption={setClickedOption} 
+        />
+      </OptionWrapper>
+      {
+        selectedRegion &&  
+        <SelectedRegion>
+          <Text>{selectedRegion}</Text>
+          <DeleteButton src="/images/x.svg" onClick={onClickDeleteRegionButton} />
+        </SelectedRegion>
+      }
+      <SearchOptionDetail isActive={optionDetailActive} setIsActive={setOptionDetailActive} idx={clickedOptionIdx} setOption={setSelectedRegion} />
     </Container>
   );
 }
