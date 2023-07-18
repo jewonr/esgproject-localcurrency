@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import OptionList from "./OptionList";
-import { region } from "../region";
-import { sector } from "../sector";
+import { region } from "../../region";
+import { sector } from "../../sector";
 import SearchBar from "../header/SearchBar";
 
 type SearchOptionDetailProps = {
@@ -64,8 +64,6 @@ const SubmitButton = styled.div`
   font-family: 'Spoqa-Bold';
 `
 
-const placeholderList = ["도 또는 광역시를 검색해보세요", "", "", ""];
-
 export default function SearchOptionDetail({ isActive, setIsActive, idx, setOption }: SearchOptionDetailProps) {
   const [clickedOption, setClickedOption] = useState(new Array(30).fill(false));
   const [clickedOptionIdx, setClickedOptionIdx] = useState(0);
@@ -116,7 +114,7 @@ export default function SearchOptionDetail({ isActive, setIsActive, idx, setOpti
       <CancelButton src="/images/x.svg" onClick={() => onClickCancelOrSaveButton("cancel")} />
     </Header>
     <Body>
-        <SearchBar text={input} onChange={onChange} onClick={onclickSearchButton} placeholder={placeholderList[0]} />
+        <SearchBar text={input} onChange={onChange} onClick={onclickSearchButton} placeholder="도 또는 광역시를 검색해보세요" />
         <OptionList optionList={optionRegionList} clickedOption={clickedOption} setClickedOption={setClickedOption} />
     </Body>
     <SubmitButton onClick={() => onClickCancelOrSaveButton("save")}>저장</SubmitButton>

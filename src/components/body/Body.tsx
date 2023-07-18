@@ -1,9 +1,11 @@
 import styled from "styled-components"
 import SecTitle from "../templates/SecTitle";
 import StoreList from "../templates/StoreList";
+import { Data } from "../../../pages";
 
 type BodyTypes = {
-  data: Array<any>;
+  data: Array<Data>;
+  secTitle: string;
 }
 
 const Container = styled.div`
@@ -19,12 +21,11 @@ const TopWrapper = styled.div`
   margin-right: 5px;
 `
 
-export default function Body({ data }: BodyTypes) {
+export default function Body({ data, secTitle }: BodyTypes) {
   return (
     <Container>
       <TopWrapper>
-        <SecTitle text="현위치 근처 가맹점" />
-        <img src="images/crosshair.svg" />
+        {secTitle && <><SecTitle text={`${secTitle} 근처 가맹점`} /><img src="images/crosshair.svg" /></>}
       </TopWrapper>
       <StoreList data={data} />
     </Container>

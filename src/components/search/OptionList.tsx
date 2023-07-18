@@ -16,7 +16,7 @@ const Container = styled.div`
 
 export default function OptionList({ optionList, clickedOption, setClickedOption }: OptionListProps) {
   const onClickOption = (idx: number) => {
-    setClickedOption(clickedOption.map(($, i) => i === idx ? true : false));
+    setClickedOption(clickedOption.map((val, i) => i === idx ? !val : false));
   }
 
   return (

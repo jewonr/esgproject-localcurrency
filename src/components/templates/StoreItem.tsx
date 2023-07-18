@@ -1,7 +1,8 @@
 import styled from "styled-components"
+import { Data } from "../../../pages";
 
 type StoreItemProps = {
-  data: any;
+  data: Data;
 }
 
 const Container = styled.div`
@@ -43,6 +44,14 @@ const Industry = styled.div`
   color: #979797;
 `
 
+const Currency = styled.div`
+  position: absolute;
+  font-size: 12px;
+  top: 15px;
+  right: 15px;
+  color: #979797;
+`
+
 const Distance = styled.div`
   position: absolute;
   font-size: 12px;
@@ -58,7 +67,8 @@ export default function StoreItem({ data }: StoreItemProps) {
       <Title>{data.affiliateNm}</Title>
       <Address>{data.lctnRoadNmAddr}</Address>
       <Industry>{data.sectorNm}</Industry>
-      <Distance>10km</Distance>
+      <Currency>{data.localBill}</Currency>
+      {data.distance && <Distance>{data.distance}km</Distance>}
     </Container>
   );
 }

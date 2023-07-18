@@ -5,15 +5,171 @@ import Body from "../src/components/body/Body";
 import Header from "../src/components/header/Header";
 import Search from "../src/components/search/Search";
 import styles from "../styles/Home.module.css";
-import useGeolocation from "react-hook-geolocation";
-import { region } from "../src/components/region";
+import { region } from "../src/region";
+
+export interface Data {
+  affiliateNm: string,  
+  crtrYmd: string,
+  ctpvNm: string,
+  insttCode: string,
+  lctnLotnoAddr: string,
+  lctnRoadNmAddr: string,
+  localBill: string,
+  mainPrd: string,
+  sectorNm: string,
+  sggNm: string,
+  telno: string,
+  distance?: number
+}
 
 export default function Home() {
   const [active, setActive] = useState(false);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Data[]>([]);
+  const [curLon, setCurLon] = useState<number>(0);
+  const [curLat, setCurLat] = useState<number>(0);
+  const [secTitleText, setSecTitleText] = useState("");
 
-  const onGeolocationUpdate = (geolocation: any) => {
-    console.log(geolocation);
+  useEffect(() => {
+    const fetchData = async () => {
+        await getUserLocation()
+      if (curLat && curLon) {
+        await findNearestCity(await getRangeFromCoordinates());
+        setSecTitleText((prev: string) => {
+          if (prev !== secTitleText) {
+            console.log(prev);
+            getStores(prev);
+          }
+          return prev;
+        })
+        // if(secTitleText.length) {
+          
+        // }
+      }
+    };
+    fetchData();
+  }, [curLat, curLon]);
+
+  const getStores = (region: string, key?: string, value?: string) => {
+    axios
+    .get(
+      value ? 
+      `http://api.data.go.kr/openapi/tn_pubr_public_local_bill_api?serviceKey=${process.env.NEXT_PUBLIC_API_KEY}&SGG_NM=${region}&${key}=${value}&pageNo=1&numOfRows=50&type=json` :
+      `http://api.data.go.kr/openapi/tn_pubr_public_local_bill_api?serviceKey=${process.env.NEXT_PUBLIC_API_KEY}&SGG_NM=${region}&pageNo=1&numOfRows=50&type=json`
+    )
+    .then(async (res) => {
+      console.log(res.data);
+      setData(res.data.response.body.items);
+      for (const [i, val] of res.data.response.body.items.entries()) {
+        if (val.lctnRoadNmAddr !== "") {
+          const storeLocation = await getAddressFromCoordinates(val.lctnRoadNmAddr);
+          if(storeLocation) {
+            console.log(curLon, curLat, storeLocation.x, storeLocation.y);
+            console.log(calculateDistance(curLon, curLat, storeLocation.x, storeLocation.y));
+            setData((prevData: Data[]): Data[] => {
+              const updatedData: Data[] = prevData.map((item, idx) => ({
+                ...item,
+                distance: idx === i ? Number(calculateDistance(curLon, curLat, storeLocation.x, storeLocation.y).toFixed(2)) : item.distance
+              }));
+              return updatedData;
+            })
+          }
+        }
+      }
+    });
+  }
+
+  const calculateDistance = (curLat: number, curLon: number, storeLat: number, storeLon: number): number => {
+    const lat1Rad = curLat * (Math.PI / 180);
+    const lon1Rad = curLon * (Math.PI / 180);
+    const lat2Rad = storeLat * (Math.PI / 180);
+    const lon2Rad = storeLon * (Math.PI / 180);
+
+    const deltaLat = lat2Rad - lat1Rad;
+    const deltaLon = lon2Rad - lon1Rad;
+
+    const a =
+      Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+      Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    const distance = 6371 * c;
+    return distance;
+  }
+
+  const getAddressFromCoordinates = async (address: string) => {
+    const url = `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(address)}`;
+
+    try {
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `KakaoAK ${process.env.NEXT_PUBLIC_KAKAO_API_KEY}`
+        }
+      });
+
+      const { documents } = response.data;
+      return documents[0]; 
+    } catch (e) {
+      console.error('API 요청 중 오류 발생 :', e);
+      return;
+    }
+  }
+
+  const getRangeFromCoordinates = async () => {
+    const url = `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${curLon}&y=${curLat}`;
+  
+    try {
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `KakaoAK ${process.env.NEXT_PUBLIC_KAKAO_API_KEY}`
+        }
+      });
+  
+      const { documents } = response.data;
+      if (documents.length > 0) {
+        const region = documents[0].region_1depth_name;
+        console.log(region);
+        if(region === "서울특별시") return "경기도";
+        return region;
+      }
+    } catch (e) {
+      console.error('API 요청 중 오류 발생 :', e);
+      return;
+    }
+  };
+
+  const getUserLocation = async () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log(position.coords.latitude, position.coords.longitude);
+          setCurLat(position.coords.latitude);
+          setCurLon(position.coords.longitude);
+          console.log(curLat, curLon);
+        },
+        (error) => {
+          console.error('위치 정보를 가져오는 중 오류가 발생했습니다:', error);
+        }
+      );
+    } else {
+      console.error('Geolocation을 지원하지 않는 브라우저입니다.');
+    }
+  }
+
+  const findNearestCity = async (range: string) => {
+    const regionList = region[range];
+    let nearestDistance = Infinity;
+    let nearestRegion = "";
+    for (const region of regionList) {
+      const regionLocation = await getAddressFromCoordinates(region);
+      let distance = calculateDistance(curLon, curLat, regionLocation.x, regionLocation.y);
+      console.log(distance, region);
+      if (distance < nearestDistance) { 
+        nearestDistance = distance;
+        nearestRegion = region;
+      }
+    }
+    console.log(nearestRegion);
+    setSecTitleText(nearestRegion);
   }
 
   const onClickSearchBox = () => {
@@ -34,28 +190,8 @@ export default function Home() {
 
     console.log(option, input, region);
     // await axios.get(`https://openapi.gg.go.kr/RegionMnyFacltStus?Key=${process.env.NEXT_PUBLIC_API_KEY}&Type=json&pIndex=1&pSize=10&${option}=${input}`)
-    await axios.get(`http://api.data.go.kr/openapi/tn_pubr_public_local_bill_api?serviceKey=${process.env.NEXT_PUBLIC_API_KEY}&SGG_NM=${region}&${option}=${input}&pageNo=1&numOfRows=20&type=json`)
-      .then(data => {
-        console.log(data.data);
-        setData(data.data.response.body.items);
-      });
-  }
-
-  useEffect(() => {
-    (async () => {
-      await axios.get(`http://api.data.go.kr/openapi/tn_pubr_public_local_bill_api?serviceKey=${process.env.NEXT_PUBLIC_API_KEY}&pageNo=1&numOfRows=20&type=json`)
-        .then(data => setData(data.data.response.body.items));
-    })();
-  }, []);
-    
-    // (async () => {
-    //   await axios.get(`http://api.data.go.kr/openapi/tn_pubr_public_local_bill_api?serviceKey=${process.env.NEXT_PUBLIC_API_KEY}&SGG_NM=홍천군&type=json&numOfRows=100`)
-    //     .then(data => async () => {
-    //       await axios.post(`http://localhost:3001/region`, data.data)
-    //         .catch(err => console.log(err));
-    //     })
-    // })();
-  // }, []);
+    getStores(region, option, input);
+  } 
 
   return (
     <>
@@ -65,7 +201,7 @@ export default function Home() {
     </Head>
     <div className={styles.container}>
       <Header onClick={onClickSearchBox} />
-      {data.length ? <Body data={data} /> : <></>}
+      <Body data={data} secTitle={secTitleText} />
       <Search onClickSearchButton={onClickSearchButton} isActive={active} setIsActive={setActive} />
     </div>
     </>
