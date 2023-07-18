@@ -5,7 +5,7 @@ import OptionList from "./OptionList";
 import SearchOptionDetail from "./SearchOptionDetail";
 
 type SearchProps = {
-  onClickSearchButton: (idx: number, input: string, region: string) => void;
+  onClickSearchButton: (region: string, idx?: number, input?: string) => void;
   isActive: boolean;
   setIsActive: ($: boolean) => void;
 }
@@ -81,10 +81,22 @@ export default function Search({ onClickSearchButton, isActive, setIsActive }: S
 
   const handleOnClickSearchButton = () => {
     setIsActive(false);
-    setInput("");
-    for(let i = 0; i < clickedOption.length; i++) {
-      if(clickedOption[i]) onClickSearchButton(i, input, selectedRegion);
+    if(selectedRegion) {
+      for(let i = 0; i < clickedOption.length; i++) {
+        if(clickedOption[i] && input) {
+          onClickSearchButton(selectedRegion, i, input);
+          setInput("");
+          return;
+        }
+      }  
+      console.log(selectedRegion);
+      onClickSearchButton(selectedRegion);
+      setInput("");
+      return;
     }
+    setInput("");
+    return;
+
   }
 
   const onClickSelectRegionButton = () => {

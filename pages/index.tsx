@@ -24,10 +24,13 @@ export interface Data {
 
 export default function Home() {
   const [active, setActive] = useState(false);
-  const [data, setData] = useState<Data[]>([]);
+  const [data, setData] = useState<Data[][]>([]);
   const [curLon, setCurLon] = useState<number>(0);
   const [curLat, setCurLat] = useState<number>(0);
   const [secTitleText, setSecTitleText] = useState("");
+  const [pageCount, setPageCount] = useState(1);
+  const [queryKey, setQueryKey] = useState("");
+  const [queryValue, setQueryValue] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,29 +56,39 @@ export default function Home() {
     axios
     .get(
       value ? 
-      `http://api.data.go.kr/openapi/tn_pubr_public_local_bill_api?serviceKey=${process.env.NEXT_PUBLIC_API_KEY}&SGG_NM=${region}&${key}=${value}&pageNo=1&numOfRows=50&type=json` :
-      `http://api.data.go.kr/openapi/tn_pubr_public_local_bill_api?serviceKey=${process.env.NEXT_PUBLIC_API_KEY}&SGG_NM=${region}&pageNo=1&numOfRows=50&type=json`
+      `http://api.data.go.kr/openapi/tn_pubr_public_local_bill_api?serviceKey=${process.env.NEXT_PUBLIC_API_KEY}&SGG_NM=${region}&${key}=${value}&pageNo=${pageCount}&numOfRows=20&type=json` :
+      `http://api.data.go.kr/openapi/tn_pubr_public_local_bill_api?serviceKey=${process.env.NEXT_PUBLIC_API_KEY}&SGG_NM=${region}&pageNo=${pageCount}&numOfRows=20&type=json`
     )
     .then(async (res) => {
+      setPageCount(prev => prev + 1);
       console.log(res.data);
-      setData(res.data.response.body.items);
+      let stores: Data[] = res.data.response.body.items;
       for (const [i, val] of res.data.response.body.items.entries()) {
         if (val.lctnRoadNmAddr !== "") {
           const storeLocation = await getAddressFromCoordinates(val.lctnRoadNmAddr);
           if(storeLocation) {
             console.log(curLon, curLat, storeLocation.x, storeLocation.y);
             console.log(calculateDistance(curLon, curLat, storeLocation.x, storeLocation.y));
-            setData((prevData: Data[]): Data[] => {
-              const updatedData: Data[] = prevData.map((item, idx) => ({
-                ...item,
-                distance: idx === i ? Number(calculateDistance(curLon, curLat, storeLocation.x, storeLocation.y).toFixed(2)) : item.distance
-              }));
-              return updatedData;
-            })
+            stores = stores.map((item, idx) => ({
+              ...item,
+              distance: idx === i ? Number(calculateDistance(curLon, curLat, storeLocation.x, storeLocation.y).toFixed(2)) : item.distance
+            }))
           }
         }
       }
-    });
+      if(data.length) {
+        if(pageCount >= 3) setData([...data, stores])
+        else setData([stores]);
+      } else {
+        setData([stores]);
+      } 
+      return;
+    })
+    .catch(e => {
+      console.log(e);
+      setData(data);
+      return;
+    })
   }
 
   const calculateDistance = (curLat: number, curLon: number, storeLat: number, storeLon: number): number => {
@@ -177,20 +190,28 @@ export default function Home() {
     console.log(active);
   }
 
-  const onClickSearchButton = async (idx: number, input: string, region: string) => {
-    setData([]);
+  const onClickSearchButton = (region: string, idx?: number, input?: string) => {
     let option = "";
     if(idx === 0) {
       option = "AFFILIATE_NM";
     } else if(idx === 1) {
       option = "SECTOR_NM";
-    } else {
-      return;
-    }
+    } 
 
-    console.log(option, input, region);
-    // await axios.get(`https://openapi.gg.go.kr/RegionMnyFacltStus?Key=${process.env.NEXT_PUBLIC_API_KEY}&Type=json&pIndex=1&pSize=10&${option}=${input}`)
-    getStores(region, option, input);
+    console.log(region, option, input);
+    
+    setQueryKey(option);
+    setQueryValue(input ? input : "");
+    setSecTitleText(region);
+    setPageCount(1);
+    setData([]);
+
+    if (input && idx) {
+      console.log("aaaaaa");
+      getStores(region, option, input);
+    } else {
+      getStores(region);
+    }
   } 
 
   return (
@@ -201,7 +222,7 @@ export default function Home() {
     </Head>
     <div className={styles.container}>
       <Header onClick={onClickSearchBox} />
-      <Body data={data} secTitle={secTitleText} />
+      <Body data={data} secTitle={secTitleText} getStores={getStores} queryKey={queryKey} queryValue={queryValue} />
       <Search onClickSearchButton={onClickSearchButton} isActive={active} setIsActive={setActive} />
     </div>
     </>
