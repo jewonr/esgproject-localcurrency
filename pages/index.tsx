@@ -40,7 +40,7 @@ export default function Home() {
         setSecTitleText((prev: string) => {
           if (prev !== secTitleText) {
             console.log(prev);
-            getStores(prev);
+            getStores(prev, false);
           }
           return prev;
         })
@@ -52,7 +52,7 @@ export default function Home() {
     fetchData();
   }, [curLat, curLon]);
 
-  const getStores = (region: string, key?: string, value?: string) => {
+  const getStores = (region: string, repeat: boolean, key?: string, value?: string) => {
     axios
     .get(
       value ? 
@@ -76,8 +76,9 @@ export default function Home() {
           }
         }
       }
+      console.log(pageCount);
       if(data.length) {
-        if(pageCount >= 3) setData([...data, stores])
+        if(repeat) setData([...data, stores])
         else setData([stores]);
       } else {
         setData([stores]);
@@ -208,11 +209,21 @@ export default function Home() {
 
     if (input && idx) {
       console.log("aaaaaa");
-      getStores(region, option, input);
+      getStores(region, false, option, input);
     } else {
-      getStores(region);
+      getStores(region, false);
     }
   } 
+
+  const SortByDistance = () => {
+
+  }
+
+  const onclickCurrentLocationButton = () => {
+    setData([]);
+    setPageCount(1);
+    getUserLocation();
+  }
 
   return (
     <>
@@ -222,7 +233,14 @@ export default function Home() {
     </Head>
     <div className={styles.container}>
       <Header onClick={onClickSearchBox} />
-      <Body data={data} secTitle={secTitleText} getStores={getStores} queryKey={queryKey} queryValue={queryValue} />
+      <Body 
+        data={data} 
+        secTitle={secTitleText} 
+        getStores={getStores} 
+        queryKey={queryKey} 
+        queryValue={queryValue} 
+        getUserLocation={getUserLocation}
+      />
       <Search onClickSearchButton={onClickSearchButton} isActive={active} setIsActive={setActive} />
     </div>
     </>

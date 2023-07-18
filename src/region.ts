@@ -3,9 +3,7 @@ interface Region {
 }
 
 export const region: Region = {
-  서울특별시: [
-    "강서구"
-  ],
+  서울특별시: [],
   인천광역시: [
     "인천광역시", "계양구", "미추홀구"
   ],

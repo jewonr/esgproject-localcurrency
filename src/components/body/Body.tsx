@@ -7,9 +7,10 @@ import AltItem from "../templates/AltItem";
 type BodyProps = {
   data: Data[][];
   secTitle: string;
-  getStores: (region: string, key?: string, value?: string) => void;
+  getStores: (region: string, repeat: boolean, key?: string, value?: string) => void;
   queryKey?: string;
   queryValue?: string;
+  getUserLocation: () => void;
 }
 
 const Container = styled.div`
@@ -70,7 +71,7 @@ const AltButton = styled.div`
 
 const arr = Array.from({ length: 10 }); // 요소가 있어야 map 메서드 작동 가능함.
 
-export default function Body({ data, secTitle, getStores, queryKey, queryValue }: BodyProps) {
+export default function Body({ data, secTitle, getStores, queryKey, queryValue, getUserLocation }: BodyProps) {
   return (
     <Container>
       <TopWrapper>
@@ -78,7 +79,7 @@ export default function Body({ data, secTitle, getStores, queryKey, queryValue }
           data.length ? 
           <>
             <SecTitle text={`${secTitle} 근처 가맹점`} />
-            <img src="images/crosshair.svg" />
+            <img src="images/crosshair.svg" onClick={getUserLocation} />
           </>
           :
           <>
@@ -93,7 +94,7 @@ export default function Body({ data, secTitle, getStores, queryKey, queryValue }
           {data.map((item, i) => (
             <StoreList data={item} key={i} />
           ))}
-          <Morebutton onClick={() => queryKey ? getStores(secTitle, queryKey, queryValue) : getStores(secTitle)}>더보기</Morebutton>
+          <Morebutton onClick={() => queryKey ? getStores(secTitle, true, queryKey, queryValue) : getStores(secTitle, true)}>더보기</Morebutton>
         </>
         : 
         <>

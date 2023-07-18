@@ -137,7 +137,7 @@ export default function Search({ onClickSearchButton, isActive, setIsActive }: S
           <DeleteButton src="/images/x.svg" onClick={onClickDeleteRegionButton} />
         </SelectedRegion>
       }
-      <SearchOptionDetail isActive={optionDetailActive} setIsActive={setOptionDetailActive} idx={clickedOptionIdx} setOption={setSelectedRegion} />
+      <SearchOptionDetail isActive={optionDetailActive} setIsActive={setOptionDetailActive} setOption={setSelectedRegion} />
     </Container>
   );
 }

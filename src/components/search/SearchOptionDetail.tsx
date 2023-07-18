@@ -2,13 +2,11 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import OptionList from "./OptionList";
 import { region } from "../../region";
-import { sector } from "../../sector";
 import SearchBar from "../header/SearchBar";
 
 type SearchOptionDetailProps = {
   isActive: boolean;
   setIsActive: ($: boolean) => void;
-  idx: number;
   setOption: ($: string) => void;
 }
 
@@ -64,7 +62,7 @@ const SubmitButton = styled.div`
   font-family: 'Spoqa-Bold';
 `
 
-export default function SearchOptionDetail({ isActive, setIsActive, idx, setOption }: SearchOptionDetailProps) {
+export default function SearchOptionDetail({ isActive, setIsActive, setOption }: SearchOptionDetailProps) {
   const [clickedOption, setClickedOption] = useState(new Array(30).fill(false));
   const [clickedOptionIdx, setClickedOptionIdx] = useState(0);
   const [input, setInput] = useState("");
@@ -84,13 +82,7 @@ export default function SearchOptionDetail({ isActive, setIsActive, idx, setOpti
   }
 
   const onClickCancelOrSaveButton = (option: "cancel" | "save") => {
-    if (option === "save") {
-      if(idx === 0) {
-        setOption(optionRegionList[clickedOptionIdx]);
-      } else if(idx === 2) {
-        setOption(sector[clickedOptionIdx])
-      }
-    }
+    if (option === "save") setOption(optionRegionList[clickedOptionIdx]);
     setIsActive(false)
     setClickedOption(new Array(30).fill(false));
     setOptionRegionList([]);
