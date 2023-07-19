@@ -46,13 +46,13 @@ const PrimaryOption = styled.div`
 
 const SelectedRegion = styled.div`
   margin: 30px 0 15px 0;
-  padding: 15px;
+  padding: 15px 10px 15px 13px;
   font-size: 15px;
   border-radius: 5px;
   height: 50px;
   display: flex;
   justify-content: space-between;
-  border: 1px solid #EFEFEF;
+  border: 1px solid #F6F6F6;
   width: max-content;
   gap: 15px;
 `
@@ -71,7 +71,6 @@ const optionList = ["가맹점명 검색", "업종별 검색"];
 export default function Search({ onClickSearchButton, isActive, setIsActive }: SearchProps) {
   const [input, setInput] = useState("");
   const [clickedOption, setClickedOption] = useState([false, false, false]);
-  const [clickedOptionIdx, setClickedOptionIdx] = useState(0);
   const [optionDetailActive, setOptionDetailActive] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState("");
 
@@ -89,7 +88,6 @@ export default function Search({ onClickSearchButton, isActive, setIsActive }: S
           return;
         }
       }  
-      console.log(selectedRegion);
       onClickSearchButton(selectedRegion);
       setInput("");
       return;

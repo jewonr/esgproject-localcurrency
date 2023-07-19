@@ -36,17 +36,10 @@ export default function Home() {
     const fetchData = async () => {
         await getUserLocation()
       if (curLat && curLon) {
-        await findNearestCity(await getRangeFromCoordinates());
-        setSecTitleText((prev: string) => {
-          if (prev !== secTitleText) {
-            console.log(prev);
-            getStores(prev, false);
-          }
-          return prev;
-        })
-        // if(secTitleText.length) {
-          
-        // }
+        await findNearestCity(await getRangeFromCoordinates()).then(data => {
+          setSecTitleText(data);
+          getStores(data, false);
+        });
       }
     };
     fetchData();
@@ -88,6 +81,8 @@ export default function Home() {
     .catch(e => {
       console.log(e);
       setData(data);
+      setPageCount(1);
+      setSecTitleText(data[0][0].sggNm);
       return;
     })
   }
@@ -184,6 +179,7 @@ export default function Home() {
     }
     console.log(nearestRegion);
     setSecTitleText(nearestRegion);
+    return nearestRegion;
   }
 
   const onClickSearchBox = () => {
@@ -208,7 +204,6 @@ export default function Home() {
     setData([]);
 
     if (input && idx) {
-      console.log("aaaaaa");
       getStores(region, false, option, input);
     } else {
       getStores(region, false);
@@ -216,13 +211,30 @@ export default function Home() {
   } 
 
   const SortByDistance = () => {
+    let stores = data.reduce((prev, next) => {
+      return prev.concat(next);
+    });
 
+    stores = stores.filter(val => val.distance).sort((a, b) => {
+      if (a.distance! > b.distance!) return 1;
+      if (a.distance! < b.distance!) return -1;
+      return 0;
+    });
+
+    setData([stores]);
   }
 
-  const onclickCurrentLocationButton = () => {
-    setData([]);
+  const onclickCurrentLocationButton = async (region: string) => {
     setPageCount(1);
-    getUserLocation();
+    await findNearestCity(await getRangeFromCoordinates()).then(data => {
+      console.log(data, region);
+      if (data === region) {
+        SortByDistance();
+      } else {
+        setData([]);
+        getStores(data, false);
+      }
+    })
   }
 
   return (
@@ -239,7 +251,7 @@ export default function Home() {
         getStores={getStores} 
         queryKey={queryKey} 
         queryValue={queryValue} 
-        getUserLocation={getUserLocation}
+        onclickCurrentLocationButton={onclickCurrentLocationButton}
       />
       <Search onClickSearchButton={onClickSearchButton} isActive={active} setIsActive={setActive} />
     </div>
