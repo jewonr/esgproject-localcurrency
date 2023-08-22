@@ -45,6 +45,14 @@ export default function Home() {
     fetchData();
   }, [curLat, curLon]);
 
+  useEffect(() => {
+    if (active) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "scroll";
+    }
+  }, [active]);
+
   const getStores = (region: string, repeat: boolean, key?: string, value?: string) => {
     axios
     .get(
@@ -184,6 +192,7 @@ export default function Home() {
 
   const onClickSearchBox = () => {
     setActive(true);
+    document.body.style.overflow = "hidden";
     console.log(active);
   }
 
@@ -210,7 +219,7 @@ export default function Home() {
     }
   } 
 
-  const SortByDistance = () => {
+  const sortByDistance = () => {
     let stores = data.reduce((prev, next) => {
       return prev.concat(next);
     });
@@ -224,12 +233,11 @@ export default function Home() {
     setData([stores]);
   }
 
-  const onclickCurrentLocationButton = async (region: string) => {
-    setPageCount(1);
+  const onClickCurrentLocationButton = async (region: string) => {
     await findNearestCity(await getRangeFromCoordinates()).then(data => {
       console.log(data, region);
       if (data === region) {
-        SortByDistance();
+        sortByDistance();
       } else {
         setData([]);
         getStores(data, false);
@@ -251,7 +259,7 @@ export default function Home() {
         getStores={getStores} 
         queryKey={queryKey} 
         queryValue={queryValue} 
-        onclickCurrentLocationButton={onclickCurrentLocationButton}
+        onClickCurrentLocationButton={onClickCurrentLocationButton}
       />
       <Search onClickSearchButton={onClickSearchButton} isActive={active} setIsActive={setActive} />
     </div>

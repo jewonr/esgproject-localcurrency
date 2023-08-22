@@ -10,7 +10,7 @@ type BodyProps = {
   getStores: (region: string, repeat: boolean, key?: string, value?: string) => void;
   queryKey?: string;
   queryValue?: string;
-  onclickCurrentLocationButton: (region: string) => void;
+  onClickCurrentLocationButton: (region: string) => void;
 }
 
 const Container = styled.div`
@@ -71,7 +71,7 @@ const AltButton = styled.div`
 
 const arr = Array.from({ length: 10 }); // 요소가 있어야 map 메서드 작동 가능함.
 
-export default function Body({ data, secTitle, getStores, queryKey, queryValue, onclickCurrentLocationButton }: BodyProps) {
+export default function Body({ data, secTitle, getStores, queryKey, queryValue, onClickCurrentLocationButton }: BodyProps) {
   return (
     <Container>
       <TopWrapper>
@@ -79,7 +79,7 @@ export default function Body({ data, secTitle, getStores, queryKey, queryValue, 
           data.length ? 
           <>
             <SecTitle text={`${secTitle} 근처 가맹점`} />
-            <img src="images/crosshair.svg" onClick={() => onclickCurrentLocationButton(secTitle)} />
+            <img src="images/crosshair.svg" onClick={() => onClickCurrentLocationButton(secTitle)} />
           </>
           :
           <>

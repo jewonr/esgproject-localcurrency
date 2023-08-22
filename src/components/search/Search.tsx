@@ -20,6 +20,7 @@ const Container = styled.div<{ isActive: boolean }>`
   padding: 64px 20px;
   background: #FFFFFF;
   display: ${props => props.isActive ? "relative" : "none"};
+  background: #F9F9F9;
 `
 
 const CancelButton = styled.img`
@@ -55,6 +56,7 @@ const SelectedRegion = styled.div`
   border: 1px solid #F6F6F6;
   width: max-content;
   gap: 15px;
+  background: #FFFFFF;
 `
 
 const Text = styled.div`
@@ -94,7 +96,6 @@ export default function Search({ onClickSearchButton, isActive, setIsActive }: S
     }
     setInput("");
     return;
-
   }
 
   const onClickSelectRegionButton = () => {
